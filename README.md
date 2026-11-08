@@ -8,13 +8,13 @@ Here, I document the real-world projects, scripts, and analyses I build to stren
 
 ## 🛠️ Technologies & Libraries Used
 - **Language:** Python 3.x
-- **Libraries:** Pandas, built-in modules (`os`, `csv`, `datetime`)
+- **Libraries:** Pandas, Seaborn, Matplotlib, built-in modules (`sqlite3`, `os`, `csv`, `datetime`)
 - **Concepts Covered:** 
-  - Command-Line Interfaces (CLI)
-  - File Handling (CSV reading/writing)
-  - Data Cleaning & Preprocessing
-  - Exploratory Data Analysis (EDA)
-  - Missing Value Imputation
+  - Command-Line Interfaces (CLI) & File Handling (CSV)
+  - Data Cleaning & Missing Value Imputation
+  - Relational Database Modeling & SQL Queries (`sqlite3`)
+  - Statistical Visualizations & Exploratory Data Analysis (EDA)
+  - Demographic Segmentation (`CASE WHEN`, `GROUP BY`)
 
 ---
 
@@ -49,6 +49,14 @@ A detailed Exploratory Data Analysis (EDA) project focusing on a retail sales da
     - Average pricing analysis for individual items.
     - Monthly sales trends.
 
+### 4. 📊 Week 3 Mini-Project: EDA Report using Pandas, SQL & Seaborn (`week_03_eda_sql/`)
+A comprehensive, publication-ready Exploratory Data Analysis mini-project on the Kaggle Titanic dataset combining Pandas, SQLite relational database queries, and Seaborn statistical plots.
+- **Key Highlights:**
+  - Ingests dataset into an in-memory / local **SQLite database**.
+  - Runs advanced SQL queries using `GROUP BY`, multi-column aggregations, and `CASE WHEN` conditional age tiers.
+  - Produces high-resolution Seaborn figures (Class/Gender survival bar plots, Age distribution histograms + KDE, Fare boxplots, and numeric correlation heatmap).
+  - Includes a dedicated [Week 3 README](week_03_eda_sql/README.md) with full query tables, findings, and charts.
+
 ---
 
 ## 🚀 How to Run Locally
@@ -57,18 +65,19 @@ To test these projects on your local machine, follow these steps:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-   cd YOUR_REPO_NAME
+   git clone https://github.com/muhammad-saaim-dev/AI-ML-Projects.git
+   cd AI-ML-Projects
    ```
 2. **Install Dependencies:**
-   Ensure you have Python installed. Then install Pandas:
+   Ensure you have Python installed. Then install Pandas, Seaborn, and Matplotlib:
    ```bash
-   pip install pandas
+   pip install pandas seaborn matplotlib
    ```
 3. **Run the scripts:**
    - Expense Tracker: `python expense_tracker.py`
    - Titanic Cleaning: `python titanic_cleaning.py`
    - Sales Analysis: `python sales_analysis.py`
+   - Week 3 EDA & SQL: `python week_03_eda_sql/eda_sql_report.py`
 
 ---
 *⭐ Feel free to explore the code. More complex Machine Learning projects and deep learning architectures will be added as I progress further in my roadmap!*
