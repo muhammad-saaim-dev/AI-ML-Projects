@@ -1,12 +1,11 @@
 """
-Week 3: Exploratory Data Analysis (EDA) on Titanic Dataset
-Using Pandas, SQLite (SQL), and Seaborn
------------------------------------------------------------
-This project demonstrates:
-1. Data Ingestion & Preprocessing with Pandas
-2. Relational Database Modeling & Analytical Queries with SQLite (SQL)
-3. Publication-quality Data Visualizations with Seaborn & Matplotlib
-4. Analytical insights on historical passenger survival patterns
+Day 20 Mini-Project: Titanic EDA with Pandas, SQL (SQLite), and Seaborn
+Author: Muhammad Saaim
+
+The goal of this project is to explore the Kaggle Titanic dataset using:
+- Pandas for quick data loading and wrangling
+- SQL (via SQLite) to write analytical queries and slice the numbers
+- Seaborn & Matplotlib to turn those numbers into clean, visual charts
 """
 
 import os
@@ -16,293 +15,280 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-def setup_database(csv_path: str, db_path: str) -> sqlite3.Connection:
-    """
-    Loads Titanic CSV dataset into an SQLite database table 'passengers'.
-    """
-    print("=" * 60)
-    print("1. LOADING DATASET & INITIALIZING SQL DATABASE")
-    print("=" * 60)
-
+def load_data_into_sql(csv_path: str, db_path: str) -> sqlite3.Connection:
+    """Reads the Titanic CSV and dumps it into a local SQLite table so we can query it."""
+    print("-> Reading dataset from:", csv_path)
     df = pd.read_csv(csv_path)
-    print(f"Dataset loaded: {df.shape[0]} rows, {df.shape[1]} columns.\n")
+    print(f"-> Loaded {len(df)} rows and {len(df.columns)} columns.")
 
+    # Connect to SQLite (creates the file if it doesn't exist)
     conn = sqlite3.connect(db_path)
+    
+    # Store dataframe as an SQL table named 'passengers'
     df.to_sql("passengers", conn, if_exists="replace", index=False)
-    print(f"Data successfully inserted into SQLite table 'passengers' at '{db_path}'.\n")
+    print("-> Data saved into SQLite table 'passengers' successfully.\n")
     return conn
 
 
-def run_sql_analysis(conn: sqlite3.Connection):
-    """
-    Executes analytical SQL queries to answer core business/EDA questions.
-    """
-    print("=" * 60)
-    print("2. EXECUTING SQL ANALYTICAL QUERIES")
-    print("=" * 60)
+def run_sql_queries(conn: sqlite3.Connection):
+    """Runs a series of practical SQL queries to answer key questions about survival."""
+    print("=" * 55)
+    print("          STEP 1: SQL DATA EXPLORATION")
+    print("=" * 55)
 
-    # Query 1: Overall Demographics & Survival Rate
+    # 1. Overall survival numbers
     q1 = """
-    SELECT
+    SELECT 
         COUNT(*) AS total_passengers,
         SUM(Survived) AS survivors,
-        COUNT(*) - SUM(Survived) AS fatalities,
-        ROUND(AVG(Survived) * 100.0, 2) AS overall_survival_rate_pct,
-        ROUND(AVG(Fare), 2) AS avg_fare_paid
+        COUNT(*) - SUM(Survived) AS lost,
+        ROUND(AVG(Survived) * 100, 2) AS survival_rate_pct,
+        ROUND(AVG(Fare), 2) AS avg_fare
     FROM passengers;
     """
-    print("[SQL Query 1] Overall Summary & Survival Rate:")
-    res1 = pd.read_sql_query(q1, conn)
-    print(res1.to_string(index=False))
-    print("-" * 60)
+    print("\n[Query 1] What was the overall survival rate?")
+    print(pd.read_sql_query(q1, conn).to_string(index=False))
 
-    # Query 2: Survival by Gender and Passenger Class
+    # 2. Gender and Class breakdown
+    # Did women and first class passengers actually have higher survival rates?
     q2 = """
-    SELECT
-        Pclass AS passenger_class,
+    SELECT 
+        Pclass AS ticket_class,
         Sex AS gender,
-        COUNT(*) AS passenger_count,
+        COUNT(*) AS total,
         SUM(Survived) AS survivors,
-        ROUND(AVG(Survived) * 100.0, 2) AS survival_rate_pct
+        ROUND(AVG(Survived) * 100, 2) AS survival_pct
     FROM passengers
     GROUP BY Pclass, Sex
-    ORDER BY Pclass ASC, survival_rate_pct DESC;
+    ORDER BY Pclass, survival_pct DESC;
     """
-    print("\n[SQL Query 2] Survival Rate by Passenger Class and Gender:")
-    res2 = pd.read_sql_query(q2, conn)
-    print(res2.to_string(index=False))
-    print("-" * 60)
+    print("\n[Query 2] Survival rates broken down by ticket class and gender:")
+    print(pd.read_sql_query(q2, conn).to_string(index=False))
 
-    # Query 3: Age Demographic Tiers using CASE WHEN
+    # 3. Age groups using CASE WHEN
+    # Grouping continuous age into sensible buckets
     q3 = """
-    SELECT
-        CASE
+    SELECT 
+        CASE 
             WHEN Age IS NULL THEN 'Unknown'
-            WHEN Age < 13 THEN 'Child (0-12)'
-            WHEN Age < 20 THEN 'Teenager (13-19)'
-            WHEN Age < 60 THEN 'Adult (20-59)'
-            ELSE 'Senior (60+)'
+            WHEN Age < 13 THEN 'Children (0-12)'
+            WHEN Age < 20 THEN 'Teens (13-19)'
+            WHEN Age < 60 THEN 'Adults (20-59)'
+            ELSE 'Seniors (60+)'
         END AS age_group,
-        COUNT(*) AS total_passengers,
+        COUNT(*) AS total_count,
         SUM(Survived) AS survivors,
-        ROUND(AVG(Survived) * 100.0, 2) AS survival_rate_pct
+        ROUND(AVG(Survived) * 100, 2) AS survival_pct
     FROM passengers
     GROUP BY age_group
-    ORDER BY survival_rate_pct DESC;
+    ORDER BY survival_pct DESC;
     """
-    print("\n[SQL Query 3] Survival by Age Group (CASE WHEN):")
-    res3 = pd.read_sql_query(q3, conn)
-    print(res3.to_string(index=False))
-    print("-" * 60)
+    print("\n[Query 3] How did age factor into survival? (using CASE WHEN):")
+    print(pd.read_sql_query(q3, conn).to_string(index=False))
 
-    # Query 4: Family Structure Impact (SibSp + Parch)
+    # 4. Family size impact
+    # Family size = SibSp (siblings/spouse) + Parch (parents/children) + 1 (the passenger)
     q4 = """
-    SELECT
+    SELECT 
         (SibSp + Parch + 1) AS family_size,
-        CASE
+        CASE 
             WHEN (SibSp + Parch) = 0 THEN 'Solo Traveler'
             WHEN (SibSp + Parch) BETWEEN 1 AND 3 THEN 'Small Family (2-4)'
             ELSE 'Large Family (5+)'
-        END AS family_category,
-        COUNT(*) AS total_passengers,
+        END AS family_type,
+        COUNT(*) AS passenger_count,
         SUM(Survived) AS survivors,
-        ROUND(AVG(Survived) * 100.0, 2) AS survival_rate_pct
+        ROUND(AVG(Survived) * 100, 2) AS survival_pct
     FROM passengers
-    GROUP BY family_category
-    ORDER BY survival_rate_pct DESC;
+    GROUP BY family_type
+    ORDER BY survival_pct DESC;
     """
-    print("\n[SQL Query 4] Survival Rate by Family Structure:")
-    res4 = pd.read_sql_query(q4, conn)
-    print(res4.to_string(index=False))
-    print("-" * 60)
+    print("\n[Query 4] Did traveling alone or with family make a difference?")
+    print(pd.read_sql_query(q4, conn).to_string(index=False))
 
-    # Query 5: Port of Embarkation Survival
+    # 5. Port of Embarkation
+    # C = Cherbourg, Q = Queenstown, S = Southampton
     q5 = """
-    SELECT
+    SELECT 
         CASE Embarked
             WHEN 'C' THEN 'Cherbourg'
             WHEN 'Q' THEN 'Queenstown'
             WHEN 'S' THEN 'Southampton'
             ELSE 'Unknown'
-        END AS embark_port,
-        COUNT(*) AS total_passengers,
+        END AS port_of_embarkation,
+        COUNT(*) AS passenger_count,
         ROUND(AVG(Fare), 2) AS avg_fare,
-        ROUND(AVG(Survived) * 100.0, 2) AS survival_rate_pct
+        ROUND(AVG(Survived) * 100, 2) AS survival_pct
     FROM passengers
-    GROUP BY embark_port
-    ORDER BY survival_rate_pct DESC;
+    GROUP BY port_of_embarkation
+    ORDER BY survival_pct DESC;
     """
-    print("\n[SQL Query 5] Survival Rate and Average Fare by Port of Embarkation:")
-    res5 = pd.read_sql_query(q5, conn)
-    print(res5.to_string(index=False))
-    print("=" * 60)
+    print("\n[Query 5] Survival and average fare based on boarding port:")
+    print(pd.read_sql_query(q5, conn).to_string(index=False))
+    print("\n" + "=" * 55)
 
 
-def generate_visualizations(csv_path: str, output_dir: str):
-    """
-    Generates high-resolution EDA figures using Seaborn & Matplotlib.
-    """
-    print("\n3. GENERATING SEABORN VISUALIZATIONS")
-    print("=" * 60)
-    os.makedirs(output_dir, exist_ok=True)
+def create_visualizations(csv_path: str, output_folder: str):
+    """Generates clean Seaborn plots to visually back up our SQL numbers."""
+    print("\n" + "=" * 55)
+    print("          STEP 2: CREATING SEABORN PLOTS")
+    print("=" * 55)
 
+    os.makedirs(output_folder, exist_ok=True)
     df = pd.read_csv(csv_path)
 
-    # Clean / derive helper columns for visualization
-    df["Survival_Status"] = df["Survived"].map({0: "Perished", 1: "Survived"})
-    df["Class_Label"] = df["Pclass"].map({1: "1st Class", 2: "2nd Class", 3: "3rd Class"})
-    df["Family_Size"] = df["SibSp"] + df["Parch"] + 1
+    # Add easy-to-read labels for plotting
+    df["Status"] = df["Survived"].map({0: "Perished", 1: "Survived"})
+    df["Class"] = df["Pclass"].map({1: "1st Class", 2: "2nd Class", 3: "3rd Class"})
+    df["FamilySize"] = df["SibSp"] + df["Parch"] + 1
 
-    # Set seaborn style theme
-    sns.set_theme(style="whitegrid", font_scale=1.05)
+    # Setting a clean aesthetic for the charts
+    sns.set_theme(style="whitegrid")
 
     # -------------------------------------------------------------
-    # Plot 1: Survival Rate by Gender and Passenger Class
+    # Chart 1: Survival by Class and Gender
     # -------------------------------------------------------------
-    plt.figure(figsize=(9, 5))
-    ax1 = sns.barplot(
+    plt.figure(figsize=(8, 5))
+    ax = sns.barplot(
         data=df,
-        x="Class_Label",
+        x="Class",
         y="Survived",
         hue="Sex",
-        palette={"male": "#4A90E2", "female": "#E94E77"},
+        palette={"male": "#457b9d", "female": "#e63946"},
         errorbar=None,
         order=["1st Class", "2nd Class", "3rd Class"]
     )
-    plt.title("Survival Rate by Passenger Class and Gender", fontsize=14, fontweight="bold", pad=12)
-    plt.xlabel("Passenger Class", fontweight="bold")
-    plt.ylabel("Survival Rate (Proportion)", fontweight="bold")
-    plt.ylim(0, 1.05)
-    for p in ax1.patches:
-        height = p.get_height()
-        if height > 0:
-            ax1.annotate(f"{height:.1%}",
-                         (p.get_x() + p.get_width() / 2., height),
-                         ha='center', va='bottom', fontsize=10, xytext=(0, 3),
-                         textcoords='offset points')
-    plt.legend(title="Gender", frameon=True)
+    plt.title("Titanic Survival Rate by Class and Gender", fontsize=13, fontweight="bold", pad=10)
+    plt.xlabel("Ticket Class")
+    plt.ylabel("Survival Percentage")
+    plt.ylim(0, 1.1)
+
+    # Add percentage labels above each bar
+    for p in ax.patches:
+        val = p.get_height()
+        if val > 0:
+            ax.annotate(f"{val:.1%}", (p.get_x() + p.get_width() / 2, val),
+                        ha='center', va='bottom', fontsize=10, xytext=(0, 3),
+                        textcoords='offset points')
+
+    plt.legend(title="Gender")
     plt.tight_layout()
-    p1_path = os.path.join(output_dir, "01_survival_by_gender_class.png")
-    plt.savefig(p1_path, dpi=300)
+    p1 = os.path.join(output_folder, "01_survival_by_gender_class.png")
+    plt.savefig(p1, dpi=300)
     plt.close()
-    print(f"Saved: {p1_path}")
+    print("Saved Chart 1:", p1)
 
     # -------------------------------------------------------------
-    # Plot 2: Age Distribution by Survival Status (Histogram + KDE)
+    # Chart 2: Age Distribution (Who survived vs who didn't)
     # -------------------------------------------------------------
-    plt.figure(figsize=(9, 5))
+    plt.figure(figsize=(8, 5))
     sns.histplot(
         data=df.dropna(subset=["Age"]),
         x="Age",
-        hue="Survival_Status",
+        hue="Status",
+        bins=25,
         kde=True,
-        bins=30,
-        palette={"Survived": "#2ECC71", "Perished": "#E74C3C"},
-        alpha=0.45
+        palette={"Survived": "#2a9d8f", "Perished": "#e76f51"},
+        alpha=0.5
     )
-    plt.title("Age Distribution: Survived vs Perished Passengers", fontsize=14, fontweight="bold", pad=12)
-    plt.xlabel("Passenger Age", fontweight="bold")
-    plt.ylabel("Count of Passengers", fontweight="bold")
+    plt.title("Age Distribution: Survived vs Perished", fontsize=13, fontweight="bold", pad=10)
+    plt.xlabel("Age (Years)")
+    plt.ylabel("Passenger Count")
     plt.tight_layout()
-    p2_path = os.path.join(output_dir, "02_age_distribution.png")
-    plt.savefig(p2_path, dpi=300)
+    p2 = os.path.join(output_folder, "02_age_distribution.png")
+    plt.savefig(p2, dpi=300)
     plt.close()
-    print(f"Saved: {p2_path}")
+    print("Saved Chart 2:", p2)
 
     # -------------------------------------------------------------
-    # Plot 3: Ticket Fare Distribution across Passenger Classes
+    # Chart 3: Fare distribution by Class
     # -------------------------------------------------------------
-    plt.figure(figsize=(9, 5))
+    plt.figure(figsize=(8, 5))
     sns.boxplot(
         data=df,
-        x="Class_Label",
+        x="Class",
         y="Fare",
-        hue="Survival_Status",
-        palette={"Survived": "#2ECC71", "Perished": "#E74C3C"},
+        hue="Status",
+        palette={"Survived": "#2a9d8f", "Perished": "#e76f51"},
         order=["1st Class", "2nd Class", "3rd Class"],
-        showfliers=False  # Omit extreme outliers to clearly see interquartile ranges
+        showfliers=False  # Hide extreme outliers so the box shapes are visible
     )
-    plt.title("Fare Distribution by Ticket Class and Survival Status", fontsize=14, fontweight="bold", pad=12)
-    plt.xlabel("Passenger Class", fontweight="bold")
-    plt.ylabel("Fare Paid (£)", fontweight="bold")
+    plt.title("Ticket Fare vs Survival across Classes", fontsize=13, fontweight="bold", pad=10)
+    plt.xlabel("Ticket Class")
+    plt.ylabel("Fare Paid (£)")
     plt.tight_layout()
-    p3_path = os.path.join(output_dir, "03_fare_by_class_boxplot.png")
-    plt.savefig(p3_path, dpi=300)
+    p3 = os.path.join(output_folder, "03_fare_by_class_boxplot.png")
+    plt.savefig(p3, dpi=300)
     plt.close()
-    print(f"Saved: {p3_path}")
+    print("Saved Chart 3:", p3)
 
     # -------------------------------------------------------------
-    # Plot 4: Family Size vs Survival Rate
+    # Chart 4: Family size vs survival rate
     # -------------------------------------------------------------
-    plt.figure(figsize=(9, 5))
-    family_stats = df.groupby("Family_Size")["Survived"].agg(["mean", "count"]).reset_index()
-    ax4 = sns.barplot(
-        data=family_stats,
-        x="Family_Size",
-        y="mean",
-        hue="Family_Size",
-        palette="Blues_d",
+    plt.figure(figsize=(8, 5))
+    family_summary = df.groupby("FamilySize")["Survived"].mean().reset_index()
+    ax_fam = sns.barplot(
+        data=family_summary,
+        x="FamilySize",
+        y="Survived",
+        hue="FamilySize",
+        palette="viridis",
         legend=False
     )
-    plt.title("Survival Rate by Total Family Size (SibSp + Parch + 1)", fontsize=14, fontweight="bold", pad=12)
-    plt.xlabel("Family Size on Board", fontweight="bold")
-    plt.ylabel("Survival Rate", fontweight="bold")
+    plt.title("Survival Rate based on Total Family Size", fontsize=13, fontweight="bold", pad=10)
+    plt.xlabel("Total Family Members on Board (including self)")
+    plt.ylabel("Survival Rate")
     plt.ylim(0, 1.0)
-    for p in ax4.patches:
-        height = p.get_height()
-        if height > 0:
-            ax4.annotate(f"{height:.1%}",
-                         (p.get_x() + p.get_width() / 2., height),
-                         ha='center', va='bottom', fontsize=9, xytext=(0, 3),
-                         textcoords='offset points')
+
+    for p in ax_fam.patches:
+        val = p.get_height()
+        if val > 0:
+            ax_fam.annotate(f"{val:.1%}", (p.get_x() + p.get_width() / 2, val),
+                            ha='center', va='bottom', fontsize=9, xytext=(0, 2),
+                            textcoords='offset points')
+
     plt.tight_layout()
-    p4_path = os.path.join(output_dir, "04_family_size_survival.png")
-    plt.savefig(p4_path, dpi=300)
+    p4 = os.path.join(output_folder, "04_family_size_survival.png")
+    plt.savefig(p4, dpi=300)
     plt.close()
-    print(f"Saved: {p4_path}")
+    print("Saved Chart 4:", p4)
 
     # -------------------------------------------------------------
-    # Plot 5: Correlation Heatmap of Numeric Attributes
+    # Chart 5: Correlation Heatmap
     # -------------------------------------------------------------
-    plt.figure(figsize=(8, 6))
-    numeric_df = df[["Survived", "Pclass", "Age", "SibSp", "Parch", "Fare", "Family_Size"]].copy()
-    corr_matrix = numeric_df.corr()
-    sns.heatmap(
-        corr_matrix,
-        annot=True,
-        cmap="coolwarm",
-        fmt=".2f",
-        linewidths=0.75,
-        cbar_kws={"label": "Pearson Correlation"}
-    )
-    plt.title("Correlation Matrix of Numeric Features", fontsize=14, fontweight="bold", pad=12)
+    plt.figure(figsize=(7, 5))
+    numeric_cols = df[["Survived", "Pclass", "Age", "SibSp", "Parch", "Fare", "FamilySize"]].copy()
+    corr = numeric_cols.corr()
+    sns.heatmap(corr, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
+    plt.title("Correlation Between Numerical Features", fontsize=13, fontweight="bold", pad=10)
     plt.tight_layout()
-    p5_path = os.path.join(output_dir, "05_correlation_heatmap.png")
-    plt.savefig(p5_path, dpi=300)
+    p5 = os.path.join(output_folder, "05_correlation_heatmap.png")
+    plt.savefig(p5, dpi=300)
     plt.close()
-    print(f"Saved: {p5_path}")
-    print("=" * 60)
-    print("All visualizations successfully generated and saved!\n")
+    print("Saved Chart 5:", p5)
+
+    print("\nAll charts successfully created in:", output_folder)
 
 
 def main():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_file = os.path.join(base_dir, "titanic.csv")
-    db_file = os.path.join(base_dir, "titanic.db")
-    plots_dir = os.path.join(base_dir, "plots")
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    csv_file = os.path.join(base_path, "titanic.csv")
+    db_file = os.path.join(base_path, "titanic.db")
+    plots_dir = os.path.join(base_path, "plots")
 
-    # Step 1: Create SQLite DB & Load CSV
-    conn = setup_database(csv_file, db_file)
+    # 1. Load data and setup SQLite
+    conn = load_data_into_sql(csv_file, db_file)
 
     try:
-        # Step 2: Run Analytical SQL Queries
-        run_sql_analysis(conn)
+        # 2. Run SQL analysis
+        run_sql_queries(conn)
 
-        # Step 3: Generate Seaborn Visualizations
-        generate_visualizations(csv_file, plots_dir)
+        # 3. Create visual plots
+        create_visualizations(csv_file, plots_dir)
 
     finally:
         conn.close()
+        print("\n[Done] Analysis complete!")
 
 
 if __name__ == "__main__":

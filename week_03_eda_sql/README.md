@@ -1,79 +1,68 @@
-# 📊 Week 3 Mini-Project: Titanic EDA Report using Pandas, SQL & Seaborn
+# 🚢 Titanic EDA Mini-Project (Pandas + SQL + Seaborn)
 
-**Course/Roadmap Milestone:** Day 20 (Week 3) — Comprehensive Exploratory Data Analysis (EDA) on a Kaggle Dataset.
+Hey there! As part of **Day 20 (Week 3)** of my AI/ML roadmap, I built this mini-project to practice end-to-end Exploratory Data Analysis (EDA) on the classic Kaggle Titanic dataset.
 
----
-
-## 📌 Executive Summary
-This project demonstrates an end-to-end Exploratory Data Analysis workflow on the classic **Kaggle Titanic: Machine Learning from Disaster** dataset. 
-
-Instead of relying solely on Python syntax, this analysis leverages a hybrid analytical architecture:
-1. **Pandas** for data ingestion, missing value verification, and transformation.
-2. **SQLite (SQL)** for structured data modeling, relational aggregation, conditional segmentation (`CASE WHEN`), and business-level reporting.
-3. **Seaborn & Matplotlib** for publication-quality visual storytelling and correlation analysis.
+Rather than only using standard Pandas functions, I wanted to practice combining **Python**, **SQL (via SQLite)**, and **Seaborn** in a single pipeline — which mirrors how data analysts and machine learning engineers work with real databases.
 
 ---
 
-## 🛠️ Tech Stack & Dependencies
-- **Language:** Python 3.12+
-- **Data Manipulation:** `pandas`
-- **Database Engine:** `sqlite3` (Native Python relational SQL engine)
-- **Data Visualization:** `seaborn`, `matplotlib`
+## 💡 What Was the Goal?
+I wanted to answer four main historical questions:
+1. **The Class & Gender Divide:** Did the "women and children first" rule hold true across all ticket classes?
+2. **Age Factors:** Which age brackets had the highest survival odds?
+3. **Family Dynamics:** Was it better to travel solo or with family members?
+4. **Ticket Fare:** How strongly was the price paid linked to passenger survival?
 
-To install all required packages:
+---
+
+## 🛠️ Tech Used
+- **Python 3**
+- **Pandas** for loading and handling the CSV data.
+- **SQLite3** (Python built-in) to load the table and run native SQL queries.
+- **Seaborn & Matplotlib** to generate clean, readable charts.
+
 ```bash
 pip install pandas seaborn matplotlib
 ```
 
 ---
 
-## 🗄️ Database Architecture & Ingestion
-The raw CSV file (`titanic.csv`) is automatically loaded and ingested into an in-process SQLite database table named `passengers`. This allows performing SQL aggregations and queries on demand:
+## 🔍 SQL Queries & Findings
 
-```python
-import sqlite3
-import pandas as pd
+To make querying straightforward, the script loads `titanic.csv` into a local SQLite table called `passengers`. Here is what the SQL queries uncovered:
 
-conn = sqlite3.connect("titanic.db")
-df = pd.read_csv("titanic.csv")
-df.to_sql("passengers", conn, if_exists="replace", index=False)
-```
-
----
-
-## 🔍 SQL Analytical Queries & Insights
-
-### 1. Overall Passenger Demographics & Survival Rate
+### 1. Overall Survival Rate
 ```sql
 SELECT 
     COUNT(*) AS total_passengers,
     SUM(Survived) AS survivors,
-    COUNT(*) - SUM(Survived) AS fatalities,
-    ROUND(AVG(Survived) * 100.0, 2) AS overall_survival_rate_pct,
-    ROUND(AVG(Fare), 2) AS avg_fare_paid
+    COUNT(*) - SUM(Survived) AS lost,
+    ROUND(AVG(Survived) * 100, 2) AS survival_rate_pct,
+    ROUND(AVG(Fare), 2) AS avg_fare
 FROM passengers;
 ```
-| Total Passengers | Survivors | Fatalities | Overall Survival Rate | Average Fare (£) |
-| :---: | :---: | :---: | :---: | :---: |
-| **891** | **342** | **549** | **38.38%** | **£32.20** |
+- **Total Passengers:** 891
+- **Survivors:** 342 (~38.38%)
+- **Lost:** 549 (~61.62%)
+- **Average Fare:** £32.20
 
-* **Insight:** Only ~38.4% of passengers survived the disaster, establishing the baseline benchmark for future predictive modeling.
+> **Takeaway:** Roughly only 1 in 3 passengers survived.
 
 ---
 
-### 2. The Intersect of Socioeconomic Class & Gender
+### 2. Survival by Ticket Class & Gender
 ```sql
 SELECT 
-    Pclass AS passenger_class,
+    Pclass AS ticket_class,
     Sex AS gender,
-    COUNT(*) AS passenger_count,
+    COUNT(*) AS total,
     SUM(Survived) AS survivors,
-    ROUND(AVG(Survived) * 100.0, 2) AS survival_rate_pct
+    ROUND(AVG(Survived) * 100, 2) AS survival_pct
 FROM passengers
 GROUP BY Pclass, Sex
-ORDER BY Pclass ASC, survival_rate_pct DESC;
+ORDER BY Pclass, survival_pct DESC;
 ```
-| Passenger Class | Gender | Total Count | Survivors | Survival Rate |
+| Ticket Class | Gender | Total | Survivors | Survival Rate |
 | :--- | :--- | :---: | :---: | :---: |
 | **1st Class** | Female | 94 | 91 | **96.81%** |
 | **1st Class** | Male | 122 | 45 | **36.89%** |
@@ -82,40 +71,37 @@ ORDER BY Pclass ASC, survival_rate_pct DESC;
 | **3rd Class** | Female | 144 | 72 | **50.00%** |
 | **3rd Class** | Male | 347 | 47 | **13.54%** |
 
-* **Insight:** The "Women and Children First" protocol is clearly evident in the data. Females in 1st Class had an astounding **96.81%** survival rate, while males in 3rd Class faced an **86.46%** fatality rate.
+> **Takeaway:** Gender and class were the biggest factors. First-class women had almost a **97% survival rate**, while third-class men had only **13.5%**.
 
 ---
 
-### 3. Age Demographic Segmentation (`CASE WHEN`)
+### 3. Age Groups using SQL `CASE WHEN`
 ```sql
 SELECT 
     CASE 
         WHEN Age IS NULL THEN 'Unknown'
-        WHEN Age < 13 THEN 'Child (0-12)'
-        WHEN Age < 20 THEN 'Teenager (13-19)'
-        WHEN Age < 60 THEN 'Adult (20-59)'
-        ELSE 'Senior (60+)'
+        WHEN Age < 13 THEN 'Children (0-12)'
+        WHEN Age < 20 THEN 'Teens (13-19)'
+        WHEN Age < 60 THEN 'Adults (20-59)'
+        ELSE 'Seniors (60+)'
     END AS age_group,
-    COUNT(*) AS total_passengers,
+    COUNT(*) AS total_count,
     SUM(Survived) AS survivors,
-    ROUND(AVG(Survived) * 100.0, 2) AS survival_rate_pct
+    ROUND(AVG(Survived) * 100, 2) AS survival_pct
 FROM passengers
 GROUP BY age_group
-ORDER BY survival_rate_pct DESC;
+ORDER BY survival_pct DESC;
 ```
-| Age Group | Total Passengers | Survivors | Survival Rate |
-| :--- | :---: | :---: | :---: |
-| **Child (0–12)** | 69 | 40 | **57.97%** |
-| **Teenager (13–19)** | 95 | 39 | **41.05%** |
-| **Adult (20–59)** | 524 | 204 | **38.93%** |
-| **Unknown** | 177 | 52 | **29.38%** |
-| **Senior (60+)** | 26 | 7 | **26.92%** |
+- **Children (0–12):** 57.97% survival (40 out of 69 survived)
+- **Teens (13–19):** 41.05% survival
+- **Adults (20–59):** 38.93% survival
+- **Seniors (60+):** 26.92% survival
 
-* **Insight:** Children were prioritized for lifeboats with a **57.97%** survival rate. Seniors suffered the lowest survival rate among known age groups at **26.92%**.
+> **Takeaway:** Children were clearly given lifeboat preference, while seniors had the lowest survival rate.
 
 ---
 
-### 4. Family Structure & Size (`SibSp + Parch + 1`)
+### 4. Traveling Alone vs. Traveling with Family
 ```sql
 SELECT 
     (SibSp + Parch + 1) AS family_size,
@@ -123,76 +109,59 @@ SELECT
         WHEN (SibSp + Parch) = 0 THEN 'Solo Traveler'
         WHEN (SibSp + Parch) BETWEEN 1 AND 3 THEN 'Small Family (2-4)'
         ELSE 'Large Family (5+)'
-    END AS family_category,
-    COUNT(*) AS total_passengers,
+    END AS family_type,
+    COUNT(*) AS passenger_count,
     SUM(Survived) AS survivors,
-    ROUND(AVG(Survived) * 100.0, 2) AS survival_rate_pct
+    ROUND(AVG(Survived) * 100, 2) AS survival_pct
 FROM passengers
-GROUP BY family_category
-ORDER BY survival_rate_pct DESC;
+GROUP BY family_type
+ORDER BY survival_pct DESC;
 ```
-| Family Category | Total Passengers | Survivors | Survival Rate |
-| :--- | :---: | :---: | :---: |
-| **Small Family (2–4)** | 292 | 169 | **57.88%** |
-| **Solo Traveler (1)** | 537 | 163 | **30.35%** |
-| **Large Family (5+)** | 62 | 10 | **16.13%** |
+- **Small Family (2–4):** **57.88%** survival rate
+- **Solo Traveler:** **30.35%** survival rate
+- **Large Family (5+):** **16.13%** survival rate
 
-* **Insight:** Traveling with a small family (2–4 members) significantly increased odds of survival (**57.88%**), whereas large families faced coordination bottlenecks and experienced the highest mortality rate (**83.87%** fatality).
+> **Takeaway:** Traveling with a small group of 2–4 people gave the highest survival chance. Solo travelers had lower survival rates (~30%), but large families struggled the most (~16%), likely because trying to keep large groups together during the evacuation was very difficult.
 
 ---
 
-## 📈 Visualizations & Key Findings
+## 📊 Visualizations
 
-### 1. Survival Rate by Gender & Class
-![Survival Rate by Class and Gender](plots/01_survival_by_gender_class.png)
-- **Key Takeaway:** Across all three passenger classes, female survival rates heavily outperformed male counterparts. 1st Class males still survived at more than double the rate of 3rd Class males.
+Here are the charts generated by `eda_sql_report.py`:
 
----
+### 1. Survival by Class and Gender
+![Survival by Class and Gender](plots/01_survival_by_gender_class.png)
 
 ### 2. Age Distribution (Survived vs. Perished)
 ![Age Distribution](plots/02_age_distribution.png)
-- **Key Takeaway:** A distinct spike in survival density is visible for toddlers and young children under age 8. The highest density of fatalities is concentrated in young working-class adults between 18 and 35.
 
----
-
-### 3. Fare Distribution across Passenger Classes
+### 3. Fare Distribution across Classes
 ![Fare Distribution by Class](plots/03_fare_by_class_boxplot.png)
-- **Key Takeaway:** Higher fares are directly correlated with higher survival rates, particularly in 1st Class where survivors paid significantly higher median fares than those who did not survive.
-
----
 
 ### 4. Family Size vs. Survival Odds
 ![Family Size Survival](plots/04_family_size_survival.png)
-- **Key Takeaway:** Survival rates peak at family sizes of 3 to 4, then drop precipitously for families of 5 or more members.
 
----
-
-### 5. Correlation Heatmap of Numeric Features
+### 5. Correlation Heatmap
 ![Correlation Heatmap](plots/05_correlation_heatmap.png)
-- **Key Takeaway:**
-  - `Pclass` is negatively correlated with `Survived` ($-0.34$), meaning lower class (higher class number: 3) strongly lowered survival chances.
-  - `Fare` is positively correlated with `Survived` ($+0.26$).
 
 ---
 
-## 🚀 How to Run Locally
+## 🏃 How to Run This Script
 
-1. **Clone the repository:**
+1. Make sure you have the required packages installed:
    ```bash
-   git clone https://github.com/muhammad-saaim-dev/AI-ML-Projects.git
-   cd AI-ML-Projects
+   pip install pandas seaborn matplotlib
    ```
 
-2. **Navigate to the Week 3 directory:**
-   ```bash
-   cd week_03_eda_sql
-   ```
-
-3. **Run the EDA & SQL pipeline:**
+2. Run the Python script:
    ```bash
    python eda_sql_report.py
    ```
-   *The script will automatically initialize the SQLite database, execute all queries, print formatted tables to the console, and generate high-resolution PNG charts in the `plots/` folder.*
+
+The script will automatically:
+- Create the SQLite database (`titanic.db`)
+- Print all SQL tables right in your terminal
+- Generate and save the 5 high-res charts inside the `plots/` folder
 
 ---
-⭐ *Completed as part of the 100-Day / Multi-Week Applied AI/ML Roadmap.*
+*Created as part of my AI/ML Roadmap portfolio.*
