@@ -1,93 +1,78 @@
 # 🚀 Python & Machine Learning Roadmap Projects
 
-Welcome to my **Python and Machine Learning Roadmap** repository! This repository serves as a personal portfolio and progress tracker as I journey through the world of Data Science, Machine Learning, and Python programming. 
+Welcome to my **Python and Machine Learning Roadmap** repository! This repository serves as a personal portfolio and progress tracker as I journey through the world of Data Science, Machine Learning, and Applied Artificial Intelligence.
 
-Here, I document the real-world projects, scripts, and analyses I build to strengthen my core concepts. This repository is structured to show my day-to-day progress, starting from foundational Python applications and moving towards advanced Data Science techniques.
+Here, I document real-world projects, scripts, and analyses built step-by-step — starting from foundational Python CLI applications and moving towards advanced statistical analysis and machine learning from scratch.
 
 ---
 
 ## 🛠️ Technologies & Libraries Used
-- **Language:** Python 3.x
-- **Libraries:** NumPy, Pandas, SciPy, Seaborn, Matplotlib, Scikit-Learn, built-in modules (`sqlite3`, `os`, `csv`, `datetime`)
-- **Concepts Covered:** 
-  - Command-Line Interfaces (CLI) & File Handling (CSV)
-  - Data Cleaning & Missing Value Imputation
-  - Relational Database Modeling & SQL Queries (`sqlite3`)
-  - Statistical Hypothesis Testing (T-Test, ANOVA, Chi-Square, Normality)
-  - Exploratory Data Analysis (EDA) & Seaborn Visualizations
-  - Machine Learning from Scratch: Gradient Descent & Linear Regression (NumPy)
+- **Language:** Python 3.12+
+- **Core Libraries:** NumPy, Pandas, SciPy, Seaborn, Matplotlib, Scikit-Learn
+- **Built-in Modules:** `sqlite3`, `os`, `csv`, `json`, `datetime`
+- **Core Competencies:**
+  - Command-Line Interfaces (CLI) & Dual Storage (CSV & JSON)
+  - Data Cleaning, Feature Extraction & Missing Value Imputation
+  - Relational Database Modeling & SQL Analytics (`sqlite3`)
+  - Statistical Hypothesis Testing (Welch's T-Test, One-Way ANOVA, Chi-Square, Normality)
+  - Exploratory Data Analysis (EDA) & Publication-Quality Seaborn Visualizations
+  - Machine Learning Algorithms from Scratch: Multiple Linear Regression & Batch Gradient Descent (NumPy)
 
 ---
 
-## 📂 Current Projects Overview
+## 📂 Projects Portfolio
 
-### 1. 💰 Expense Tracker (`expense_tracker.py`)
-A robust, CLI-based Python application designed to help users manage their daily expenses effectively.
-- **Features:** 
-  - Add new expenses with automated input validation to prevent crashes from invalid data types.
-  - View a detailed list of all logged expenses and categories.
-  - Automatically calculates and displays the total amount spent.
-- **Technical Highlights:** Implements persistent data storage using Python's native `csv` and `os` modules. Data is safely written to and read from `expenses.csv`, ensuring expenses are not lost after closing the program.
+### 1. 💰 [Mini Project 1: CLI Expense Tracker (`miniproject_01_expense_tracker/`)](miniproject_01_expense_tracker/)
+A command-line expense tracker designed to manage and monitor daily expenses with robust validation.
+- **Key Features:**
+  - Automated input validation to prevent crashes from negative or non-numeric inputs.
+  - Dual persistent data storage: records are automatically written to both CSV (`expenses.csv`) and structured JSON (`expenses.json`).
+  - Itemized logging and running total calculation.
+  - Dedicated [Mini Project 1 README](miniproject_01_expense_tracker/README.md).
 
-### 2. 🚢 Titanic Dataset Cleaning (`titanic_cleaning.py`)
-A comprehensive data preprocessing script tackling the famous Kaggle Titanic dataset. Data cleaning is the most crucial step in Machine Learning, and this script demonstrates essential techniques.
-- **Key Operations:**
-  - **Age Imputation:** Fills missing age values using the statistical `median` to avoid outliers skewing the data.
-  - **Feature Extraction:** Intelligently extracts the `Deck` level from the complex `Cabin` string format.
-  - **Handling Unknowns:** Replaces missing `Deck` values with "Unknown" and completely drops the highly sparse `Cabin` column.
-  - **Mode Imputation:** Fills missing `Embarked` (port of embarkation) values using the most frequent value (`mode`).
-- **Goal:** To produce a clean, ready-to-use dataset for future predictive modeling.
+### 2. 🚢📊 [Mini Project 2: Titanic Data Cleaning & Retail Sales EDA (`miniproject_02_data_cleaning_and_eda/`)](miniproject_02_data_cleaning_and_eda/)
+A dual-part data preprocessing and analytics project tackling real-world data challenges using `pandas`.
+- **Part A (Titanic Cleaning):** Median imputation for missing ages, intelligent deck extraction from cabin codes, dropping high-null features, and mode imputation for embarkation ports.
+- **Part B (Sales Analysis):** Business exploratory analysis calculating revenue, volume by category/product, regional demand share, and monthly sales trajectories.
+- Dedicated [Mini Project 2 README](miniproject_02_data_cleaning_and_eda/README.md).
 
-### 3. 📈 Sales Dataset Analysis (`sales_analysis.py`)
-A detailed Exploratory Data Analysis (EDA) project focusing on a retail sales dataset to extract meaningful business insights using `pandas`.
-- **Key Operations:**
-  - **Data Inspection & Cleaning:** Checks dataset shape, data types, null values, and duplicate records.
-  - **Type Conversion:** Accurately converts date strings into proper `datetime` objects for time-series analysis.
-  - **Business Metrics Calculated:**
-    - Overall Total Sales Revenue & Total Quantity Sold.
-    - Product-wise performance (Best-selling products by volume and revenue).
-    - Category-wise and Region-wise market share.
-    - Average pricing analysis for individual items.
-    - Monthly sales trends.
+### 3. 📊 [Mini Project 3: Titanic EDA Report with SQL & Seaborn (`miniproject_03_eda_sql/`)](miniproject_03_eda_sql/)
+A hybrid analytical pipeline combining Pandas, an in-process SQLite relational database, and Seaborn statistical graphics.
+- **Key Features:**
+  - Ingests dataset into a local SQLite table (`passengers`).
+  - Executes SQL queries utilizing multi-column `GROUP BY`, aggregations, and `CASE WHEN` conditional age brackets.
+  - Generates 5 high-resolution (300 DPI) Seaborn charts covering class/gender divides, age curves, fare boxplots, and numeric correlations.
+  - Dedicated [Mini Project 3 README](miniproject_03_eda_sql/README.md).
 
-### 4. 📊 Mini Project 3: Titanic EDA Report using Pandas, SQL & Seaborn (`miniproject_03_eda_sql/`)
-An Exploratory Data Analysis mini-project on the Kaggle Titanic dataset combining Pandas, SQLite relational database queries, and Seaborn statistical plots.
-- **Key Highlights:**
-  - Ingests dataset into a local **SQLite database** table.
-  - Runs advanced SQL queries using `GROUP BY`, multi-column aggregations, and `CASE WHEN` conditional age tiers.
-  - Produces high-resolution Seaborn figures (Class/Gender survival bar plots, Age distribution histograms + KDE, Fare boxplots, and numeric correlation heatmap).
-  - Includes a dedicated [Mini Project 3 README](miniproject_03_eda_sql/README.md) with full query tables, findings, and charts.
-
-### 5. 📈 Mini Project 4: Statistical EDA & NumPy Linear Regression (`miniproject_04_linear_regression/`)
+### 4. 📈 [Mini Project 4: Statistical EDA & NumPy Linear Regression (`miniproject_04_linear_regression/`)](miniproject_04_linear_regression/)
 An end-to-end project on the Medical Insurance dataset combining rigorous statistical hypothesis testing with a from-scratch implementation of Multiple Linear Regression using pure NumPy and Batch Gradient Descent.
-- **Key Highlights:**
-  - **Statistical Tests:** Independent Two-Sample T-Test (Smokers vs Non-Smokers), One-Way ANOVA across 4 geographic regions, Chi-Square test of independence (Sex vs Smoker), Pearson correlation with p-values, and D'Agostino normality test.
+- **Key Features:**
+  - **5 Statistical Tests:** Independent Two-Sample T-Test (Smokers vs Non-Smokers), One-Way ANOVA across 4 geographic regions, Chi-Square test of independence (Sex vs Smoker), Pearson correlation with p-values, and D'Agostino normality test.
   - **NumPy from Scratch:** Derivation and implementation of hypothesis $\hat{y} = Xw + b$, MSE cost function, and gradient descent update equations.
-  - **Benchmark Parity:** Achieves exact mathematical convergence with Scikit-Learn's OLS solver ($R^2 = 0.7510$, RMSE = $6,234.61).
-  - Includes a dedicated [Mini Project 4 README](miniproject_04_linear_regression/README.md) and 5 publication charts.
+  - **Mathematical Parity:** Matches Scikit-Learn's analytical OLS solver with exact decimal precision ($R^2 = 0.7510$, RMSE = $6,234.61).
+  - Dedicated [Mini Project 4 README](miniproject_04_linear_regression/README.md).
 
 ---
 
 ## 🚀 How to Run Locally
-
-To test these projects on your local machine, follow these steps:
 
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/muhammad-saaim-dev/AI-ML-Projects.git
    cd AI-ML-Projects
    ```
+
 2. **Install Dependencies:**
-   Ensure you have Python installed. Then install required libraries:
    ```bash
    pip install numpy pandas scipy matplotlib seaborn scikit-learn
    ```
-3. **Run the scripts:**
-   - Expense Tracker: `python expense_tracker.py`
-   - Titanic Cleaning: `python titanic_cleaning.py`
-   - Sales Analysis: `python sales_analysis.py`
-   - Mini Project 3 (EDA & SQL): `python miniproject_03_eda_sql/eda_sql_report.py`
-   - Mini Project 4 (Statistical EDA & NumPy Regression): `python miniproject_04_linear_regression/linear_regression_scratch.py`
+
+3. **Run any project:**
+   - **Mini Project 1:** `python miniproject_01_expense_tracker/expense_tracker.py`
+   - **Mini Project 2 (Titanic):** `python miniproject_02_data_cleaning_and_eda/titanic_cleaning.py`
+   - **Mini Project 2 (Sales):** `python miniproject_02_data_cleaning_and_eda/sales_analysis.py`
+   - **Mini Project 3:** `python miniproject_03_eda_sql/eda_sql_report.py`
+   - **Mini Project 4:** `python miniproject_04_linear_regression/linear_regression_scratch.py`
 
 ---
-*⭐ Feel free to explore the code. More complex Machine Learning projects and deep learning architectures will be added as I progress further in my roadmap!*
+*⭐ Feel free to explore the code. More Machine Learning models, deep learning architectures, and end-to-end pipelines will be added as I progress further in my roadmap!*
