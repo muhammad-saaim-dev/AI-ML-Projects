@@ -1,6 +1,6 @@
-# 📈 Day 27: Statistical EDA & NumPy Linear Regression (from Scratch)
+# 📈 Mini Project 4: Statistical EDA & NumPy Linear Regression (from Scratch)
 
-Hey everyone! For **Day 27** of my AI/ML roadmap, I built this project to master two foundational skills in data science and machine learning:
+Hey everyone! For **Mini Project 4 (Day 27)** of my AI/ML roadmap, I built this project to master two foundational skills in data science and machine learning:
 1. **Hypothesis Testing & Statistical Inference** on real-world data.
 2. **Implementing Multiple Linear Regression with Gradient Descent from Scratch using pure NumPy** — without relying on Scikit-Learn's prebuilt solver for the math.
 
@@ -179,3 +179,4 @@ To verify the mathematical correctness of my NumPy gradient descent algorithm, I
 
 ---
 *Created as part of Day 27 of my Applied AI/ML Roadmap.*
+

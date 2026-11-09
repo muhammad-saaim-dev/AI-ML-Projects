@@ -50,21 +50,21 @@ A detailed Exploratory Data Analysis (EDA) project focusing on a retail sales da
     - Average pricing analysis for individual items.
     - Monthly sales trends.
 
-### 4. 📊 Week 3 Mini-Project: EDA Report using Pandas, SQL & Seaborn (`week_03_eda_sql/`)
+### 4. 📊 Mini Project 3: Titanic EDA Report using Pandas, SQL & Seaborn (`miniproject_03_eda_sql/`)
 An Exploratory Data Analysis mini-project on the Kaggle Titanic dataset combining Pandas, SQLite relational database queries, and Seaborn statistical plots.
 - **Key Highlights:**
   - Ingests dataset into a local **SQLite database** table.
   - Runs advanced SQL queries using `GROUP BY`, multi-column aggregations, and `CASE WHEN` conditional age tiers.
   - Produces high-resolution Seaborn figures (Class/Gender survival bar plots, Age distribution histograms + KDE, Fare boxplots, and numeric correlation heatmap).
-  - Includes a dedicated [Week 3 README](week_03_eda_sql/README.md) with full query tables, findings, and charts.
+  - Includes a dedicated [Mini Project 3 README](miniproject_03_eda_sql/README.md) with full query tables, findings, and charts.
 
-### 5. 📈 Day 27 (Project 1): Statistical EDA & NumPy Linear Regression (`day_27_linear_regression/`)
+### 5. 📈 Mini Project 4: Statistical EDA & NumPy Linear Regression (`miniproject_04_linear_regression/`)
 An end-to-end project on the Medical Insurance dataset combining rigorous statistical hypothesis testing with a from-scratch implementation of Multiple Linear Regression using pure NumPy and Batch Gradient Descent.
 - **Key Highlights:**
   - **Statistical Tests:** Independent Two-Sample T-Test (Smokers vs Non-Smokers), One-Way ANOVA across 4 geographic regions, Chi-Square test of independence (Sex vs Smoker), Pearson correlation with p-values, and D'Agostino normality test.
   - **NumPy from Scratch:** Derivation and implementation of hypothesis $\hat{y} = Xw + b$, MSE cost function, and gradient descent update equations.
   - **Benchmark Parity:** Achieves exact mathematical convergence with Scikit-Learn's OLS solver ($R^2 = 0.7510$, RMSE = $6,234.61).
-  - Includes a dedicated [Day 27 README](day_27_linear_regression/README.md) and 5 publication charts.
+  - Includes a dedicated [Mini Project 4 README](miniproject_04_linear_regression/README.md) and 5 publication charts.
 
 ---
 
@@ -86,8 +86,8 @@ To test these projects on your local machine, follow these steps:
    - Expense Tracker: `python expense_tracker.py`
    - Titanic Cleaning: `python titanic_cleaning.py`
    - Sales Analysis: `python sales_analysis.py`
-   - Week 3 EDA & SQL: `python week_03_eda_sql/eda_sql_report.py`
-   - Day 27 Statistical EDA & NumPy Regression: `python day_27_linear_regression/linear_regression_scratch.py`
+   - Mini Project 3 (EDA & SQL): `python miniproject_03_eda_sql/eda_sql_report.py`
+   - Mini Project 4 (Statistical EDA & NumPy Regression): `python miniproject_04_linear_regression/linear_regression_scratch.py`
 
 ---
 *⭐ Feel free to explore the code. More complex Machine Learning projects and deep learning architectures will be added as I progress further in my roadmap!*
