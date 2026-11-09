@@ -8,13 +8,14 @@ Here, I document the real-world projects, scripts, and analyses I build to stren
 
 ## 🛠️ Technologies & Libraries Used
 - **Language:** Python 3.x
-- **Libraries:** Pandas, Seaborn, Matplotlib, built-in modules (`sqlite3`, `os`, `csv`, `datetime`)
+- **Libraries:** NumPy, Pandas, SciPy, Seaborn, Matplotlib, Scikit-Learn, built-in modules (`sqlite3`, `os`, `csv`, `datetime`)
 - **Concepts Covered:** 
   - Command-Line Interfaces (CLI) & File Handling (CSV)
   - Data Cleaning & Missing Value Imputation
   - Relational Database Modeling & SQL Queries (`sqlite3`)
-  - Statistical Visualizations & Exploratory Data Analysis (EDA)
-  - Demographic Segmentation (`CASE WHEN`, `GROUP BY`)
+  - Statistical Hypothesis Testing (T-Test, ANOVA, Chi-Square, Normality)
+  - Exploratory Data Analysis (EDA) & Seaborn Visualizations
+  - Machine Learning from Scratch: Gradient Descent & Linear Regression (NumPy)
 
 ---
 
@@ -50,12 +51,20 @@ A detailed Exploratory Data Analysis (EDA) project focusing on a retail sales da
     - Monthly sales trends.
 
 ### 4. 📊 Week 3 Mini-Project: EDA Report using Pandas, SQL & Seaborn (`week_03_eda_sql/`)
-A comprehensive, publication-ready Exploratory Data Analysis mini-project on the Kaggle Titanic dataset combining Pandas, SQLite relational database queries, and Seaborn statistical plots.
+An Exploratory Data Analysis mini-project on the Kaggle Titanic dataset combining Pandas, SQLite relational database queries, and Seaborn statistical plots.
 - **Key Highlights:**
-  - Ingests dataset into an in-memory / local **SQLite database**.
+  - Ingests dataset into a local **SQLite database** table.
   - Runs advanced SQL queries using `GROUP BY`, multi-column aggregations, and `CASE WHEN` conditional age tiers.
   - Produces high-resolution Seaborn figures (Class/Gender survival bar plots, Age distribution histograms + KDE, Fare boxplots, and numeric correlation heatmap).
   - Includes a dedicated [Week 3 README](week_03_eda_sql/README.md) with full query tables, findings, and charts.
+
+### 5. 📈 Day 27 (Project 1): Statistical EDA & NumPy Linear Regression (`day_27_linear_regression/`)
+An end-to-end project on the Medical Insurance dataset combining rigorous statistical hypothesis testing with a from-scratch implementation of Multiple Linear Regression using pure NumPy and Batch Gradient Descent.
+- **Key Highlights:**
+  - **Statistical Tests:** Independent Two-Sample T-Test (Smokers vs Non-Smokers), One-Way ANOVA across 4 geographic regions, Chi-Square test of independence (Sex vs Smoker), Pearson correlation with p-values, and D'Agostino normality test.
+  - **NumPy from Scratch:** Derivation and implementation of hypothesis $\hat{y} = Xw + b$, MSE cost function, and gradient descent update equations.
+  - **Benchmark Parity:** Achieves exact mathematical convergence with Scikit-Learn's OLS solver ($R^2 = 0.7510$, RMSE = $6,234.61).
+  - Includes a dedicated [Day 27 README](day_27_linear_regression/README.md) and 5 publication charts.
 
 ---
 
@@ -69,15 +78,16 @@ To test these projects on your local machine, follow these steps:
    cd AI-ML-Projects
    ```
 2. **Install Dependencies:**
-   Ensure you have Python installed. Then install Pandas, Seaborn, and Matplotlib:
+   Ensure you have Python installed. Then install required libraries:
    ```bash
-   pip install pandas seaborn matplotlib
+   pip install numpy pandas scipy matplotlib seaborn scikit-learn
    ```
 3. **Run the scripts:**
    - Expense Tracker: `python expense_tracker.py`
    - Titanic Cleaning: `python titanic_cleaning.py`
    - Sales Analysis: `python sales_analysis.py`
    - Week 3 EDA & SQL: `python week_03_eda_sql/eda_sql_report.py`
+   - Day 27 Statistical EDA & NumPy Regression: `python day_27_linear_regression/linear_regression_scratch.py`
 
 ---
 *⭐ Feel free to explore the code. More complex Machine Learning projects and deep learning architectures will be added as I progress further in my roadmap!*
